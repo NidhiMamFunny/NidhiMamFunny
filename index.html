@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nidhi Mam Funny - Best Funny Videos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#fffef5] text-zinc-900">
+<header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+    <h1 class="text-2xl font-black tracking-tight">NIDHI MAM FUNNY <span>😂</span></h1>
+    <div class="flex items-center gap-2">
+      <span id="userBadge" class="text-[11px] bg-zinc-100 px-3 py-1 rounded-full font-bold">GUEST MODE</span>
+      <a id="fbBtn" href="https://facebook.com" target="_blank" class="bg-[#1877F2] text-white px-4 py-2 rounded-full text-xs font-bold">Facebook Page</a>
+      <button onclick="openLogin()" class="bg-black text-white px-5 py-2 rounded-full text-xs font-black">LOGIN</button>
+    </div>
+  </div>
+</header>
+
+<div id="topAd" class="max-w-7xl mx-auto px-4 mt-4"><div class="bg-yellow-100 border-2 border-dashed border-yellow-400 p-6 text-center rounded-2xl font-bold">Top Ad Banner - Admin will place ad here</div></div>
+
+<div class="max-w-7xl mx-auto px-4 mt-6 grid grid-cols-1 lg:grid-cols-4 gap-6 pb-20">
+  <div class="lg:col-span-3">
+    <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-black">Latest Funny Videos</h2><p class="text-xs text-zinc-500">No login required - Guest can watch</p></div>
+    <div id="videoGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>
+  <div class="space-y-4">
+    <div id="sideAd" class="bg-white border rounded-2xl p-6 text-center min-h-[250px] shadow-sm"><p class="font-bold">Sidebar Ad</p><p class="text-xs text-zinc-400 mt-2">High CPC Ad Space</p></div>
+    <div id="midAd" class="bg-white border rounded-2xl p-6 text-center shadow-sm">Mid Ad Slot</div>
+    <div class="bg-black text-white p-5 rounded-2xl"><h3 class="font-black">Enjoy Without Login</h3><p class="text-sm text-zinc-400 mt-2">You are in Guest Mode. You can watch all videos. Login only if you want to be tracked by admin for analytics.</p></div>
+  </div>
+</div>
+
+<div id="bottomAd" class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-[0_-10px_40px_rgba(0,0,0,0.1)] p-3 text-center z-40"><span class="font-bold text-sm">Bottom Sticky Ad - Lots of Ads as you requested</span> <button onclick="this.parentElement.style.display='none'" class="ml-4 bg-zinc-100 px-3 py-1 rounded-full text-xs">Close X</button></div>
+
+<div id="videoModal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl w-full max-w-3xl overflow-hidden">
+    <div class="p-4 flex justify-between items-center border-b"><h3 id="modalTitle" class="font-black"></h3><button onclick="closeVideo()" class="bg-zinc-100 w-8 h-8 rounded-full">X</button></div>
+    <div id="modalPlayer" class="aspect-video bg-black"></div>
+    <div id="modalDesc" class="p-4 text-sm text-zinc-600"></div>
+  </div>
+</div>
+
+<div id="passModal" class="fixed inset-0 bg-black/60 hidden z-[60] flex items-center justify-center p-4">
+  <div class="bg-white p-6 rounded-2xl w-full max-w-sm"><h3 class="font-black mb-1">Locked Video 🔒</h3><p class="text-sm text-zinc-500 mb-4">Admin set a password for this video</p><input id="passInput" type="password" placeholder="Enter Video Password" class="w-full border rounded-xl px-4 py-3 mb-3"><p id="passError" class="text-red-500 text-sm hidden mb-2">Wrong Password!</p><div class="flex gap-2"><button onclick="checkPass()" class="flex-1 bg-black text-white py-3 rounded-xl font-black">Unlock</button><button onclick="closePass()" class="flex-1 bg-zinc-100 py-3 rounded-xl">Cancel</button></div></div>
+</div>
+
+<div id="loginModal" class="fixed inset-0 bg-black/60 hidden z-[70] flex items-center justify-center p-4">
+  <div class="bg-white p-6 rounded-2xl w-full max-w-md">
+    <div class="flex justify-between mb-4"><h3 class="text-xl font-black">Login</h3><button onclick="closeLogin()" class="bg-zinc-100 w-8 h-8 rounded-full">X</button></div>
+    <p class="text-sm text-zinc-500 mb-4">Guest Mode is active. Login is optional and will be tracked in Admin Panel with Time & IP.</p>
+    <input id="loginName" placeholder="Your Name" class="w-full border rounded-xl px-4 py-3 mb-3">
+    <input id="loginEmail" placeholder="Your Email" class="w-full border rounded-xl px-4 py-3 mb-3">
+    <button onclick="doUserLogin('Email')" class="w-full bg-black text-white py-3 rounded-xl font-black">Login with Email</button>
+    <div class="text-center text-xs text-zinc-400 my-3">OR</div>
+    <button onclick="doUserLogin('Facebook')" class="w-full bg-[#1877F2] text-white py-3 rounded-xl font-black">Login with Facebook</button>
+    <button onclick="continueGuest()" class="w-full bg-zinc-100 py-3 rounded-xl mt-3">Continue as Guest</button>
+  </div>
+</div>
+
+<script>
+function getD(k){ try{ return JSON.parse(localStorage.getItem(k)||'[]'); }catch{ return []; } }
+function saveD(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+let pendingVideo=null;
+function loadSite(){
+  const settings = JSON.parse(localStorage.getItem('nidhi_settings')||'{}');
+  if(settings.fbLink) document.getElementById('fbBtn').href=settings.fbLink;
+  const videos=getD('nidhi_videos');
+  const grid=document.getElementById('videoGrid');
+  if(!videos.length){
+    grid.innerHTML='<div class="col-span-2 bg-white border-2 border-dashed rounded-2xl p-12 text-center"><p class="text-zinc-500">No videos yet. Admin will add soon.</p></div>';
+  } else {
+    grid.innerHTML=videos.map((v,i)=>{
+      const ad = (i>0 && i%2===0) ? `<div class="md:col-span-2 bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-center font-bold text-sm">Advertisement - In Feed Ad ${i/2}</div>` : '';
+      return `${ad}<div onclick="openVideo(${v.id})" class="bg-white border rounded-2xl overflow-hidden hover:shadow-xl cursor-pointer transition"><div class="aspect-video bg-zinc-100 relative"><img src="${v.thumb||'https://picsum.photos/seed/'+v.id+'/400/225'}" class="w-full h-full object-cover"><div class="absolute top-2 left-2 bg-black/70 text-white text-[10px] px-2 py-1 rounded-full">${v.password?'🔒 Password Protected':''}</div></div><div class="p-3"><h3 class="font-bold line-clamp-2 text-sm">${v.title}</h3><p class="text-xs text-zinc-500 mt-1 truncate">${v.desc||'Funny video'}</p></div></div>`;
+    }).join('');
+  }
+  renderAds(); checkUser();
+}
+function renderAds(){
+  const ads=getD('nidhi_ads');
+  if(!ads.length) return;
+  if(ads[0]) document.getElementById('topAd').innerHTML = ads[0].type==='html'? ads[0].htmlCode : `<a href="${ads[0].linkUrl}" target="_blank"><img src="${ads[0].imageUrl}" class="mx-auto max-h-[90px] rounded-xl"></a>`;
+  if(ads[1]) document.getElementById('sideAd').innerHTML = ads[1].type==='html'? ads[1].htmlCode : `<a href="${ads[1].linkUrl}" target="_blank"><img src="${ads[1].imageUrl}" class="w-full rounded-xl"></a>`;
+  if(ads[2]) document.getElementById('midAd').innerHTML = ads[2].type==='html'? ads[2].htmlCode : `<a href="${ads[2].linkUrl}" target="_blank"><img src="${ads[2].imageUrl}" class="w-full rounded-xl"></a>`;
+  if(ads[3]) document.getElementById('bottomAd').innerHTML = (ads[3].type==='html'? ads[3].htmlCode : `<a href="${ads[3].linkUrl}" target="_blank"><img src="${ads[3].imageUrl}" class="mx-auto max-h-[60px]"></a>`) + `<button onclick="this.parentElement.style.display='none'" class="ml-4 bg-zinc-100 px-3 py-1 rounded-full text-xs">X</button>`;
+}
+function openVideo(id){ const v=getD('nidhi_videos').find(x=>x.id===id); if(!v) return; if(v.password){ pendingVideo=v; document.getElementById('passModal').classList.remove('hidden'); return; } play(v); }
+function checkPass(){ const p=document.getElementById('passInput').value; if(pendingVideo && p===pendingVideo.password){ document.getElementById('passModal').classList.add('hidden'); document.getElementById('passInput').value=''; document.getElementById('passError').classList.add('hidden'); play(pendingVideo); pendingVideo=null; } else { document.getElementById('passError').classList.remove('hidden'); } }
+function closePass(){ document.getElementById('passModal').classList.add('hidden'); pendingVideo=null; }
+function play(v){ document.getElementById('modalTitle').innerText=v.title; document.getElementById('modalDesc').innerText=v.desc||''; document.getElementById('modalPlayer').innerHTML=`<iframe src="${v.videoLink}" class="w-full h-full" frameborder="0" allowfullscreen></iframe><div class="bg-zinc-900 text-white text-xs p-2 text-center"><a href="${v.videoLink}" target="_blank" class="underline">Open in New Tab if not loading</a></div>`; document.getElementById('videoModal').classList.remove('hidden'); }
+function closeVideo(){ document.getElementById('videoModal').classList.add('hidden'); document.getElementById('modalPlayer').innerHTML=''; }
+function openLogin(){ document.getElementById('loginModal').classList.remove('hidden'); }
+function closeLogin(){ document.getElementById('loginModal').classList.add('hidden'); }
+function continueGuest(){ closeLogin(); }
+async function doUserLogin(method){ const name=document.getElementById('loginName').value||'Guest'; const email=document.getElementById('loginEmail').value||'guest@test.com'; let ip='Unknown'; try{ const r=await fetch('https://api.ipify.org?format=json'); const d=await r.json(); ip=d.ip; }catch{} const log={user:name+' ('+email+')', method, time:new Date().toLocaleString(), ip, device:navigator.userAgent.substring(0,100)}; const logs=getD('nidhi_login_logs'); logs.push(log); saveD('nidhi_login_logs', logs); localStorage.setItem('nidhi_current_user', JSON.stringify({name,email,method})); document.getElementById('userBadge').innerText=name.toUpperCase(); closeLogin(); }
+function checkUser(){ const u=localStorage.getItem('nidhi_current_user'); if(u){ try{ const user=JSON.parse(u); document.getElementById('userBadge').innerText=user.name.toUpperCase(); document.getElementById('userBadge').classList.add('bg-green-100','text-green-700'); }catch{} } }
+loadSite();
+</script>
+</body>
+</html>
