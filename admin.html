@@ -81,7 +81,7 @@
   </div>
 </div>
 <script>
-const EMAIL="IndiaStay@outlook.com"; const PASS="Kumar@Aman @@12";
+const EMAIL="IndiaStay@outlook.com"; const PASS="Kumar@Aman@@12";
 function doLogin(){ const e=document.getElementById('adminEmail').value.trim(); const p=document.getElementById('adminPass').value; if(e===EMAIL && p===PASS){ sessionStorage.setItem('admin_logged_in','true'); init(); } else { document.getElementById('loginError').classList.remove('hidden'); } }
 function logout(){ sessionStorage.removeItem('admin_logged_in'); location.reload(); }
 function showTab(t){ document.querySelectorAll('[id^=tab-]').forEach(x=>x.classList.add('hidden')); document.getElementById('tab-'+t).classList.remove('hidden'); }
